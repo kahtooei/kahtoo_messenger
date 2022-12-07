@@ -1,0 +1,43 @@
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+
+class dbHelper {
+  late Database db;
+  late String _path;
+  String _createChatsTable = '''
+                  create table chats ( 
+                      id integer primary key autoincrement,
+                      username text not null UNIQUE , 
+                      name text not null,
+                      type  integer  not null,
+                      )
+                  ''';
+
+  String _createMessagesTable = '''
+                  create table messages ( 
+                      id integer UNIQUE not null,
+                      author text not null,
+                      content text not null,
+                      chat text not null,
+                      send_date not null,
+                      receive_date text,
+                      seen_date text
+                      )
+                  ''';
+
+  Future open({String dbname: "kahtooMessenger.db"}) async {
+    print("open in Provider");
+    var dbpath = await getDatabasesPath();
+    _path = join(dbpath, dbname);
+    db = await openDatabase(_path, version: 1,
+        onCreate: (Database db, int version) async {
+      await db.execute(_createChatsTable);
+      await db.execute(_createMessagesTable);
+    });
+  }
+
+  Future close() async {
+    print("close in Provider");
+    db.close();
+  }
+}
