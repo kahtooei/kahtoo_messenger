@@ -9,17 +9,17 @@ class MessageHelper extends dbHelper {
   Future<Message> insert(Message message) async {
     print("insert in messages");
     print(message.toMap());
-    int id = await db.insert(_tableName, message.toMap());
-    print("message id : $id");
+    await db.insert(_tableName, message.toMap());
+    print("message id : ${message.id}");
     return message;
   }
 
   Future<Message> select(int _id) async {
     Message message = Message(
       id: -1,
-      author: "",
+      author: -1,
       content: "",
-      chat: "",
+      chatgroup: null,
       send_date: "",
       receive_date: null,
       seen_date: null,
@@ -34,7 +34,7 @@ class MessageHelper extends dbHelper {
         id: res[0]["id"],
         author: res[0]["author"],
         content: res[0]["content"],
-        chat: res[0]["chat"],
+        chatgroup: res[0]["chatgroup"],
         send_date: res[0]["send_date"],
         receive_date: res[0]["receive_date"],
         seen_date: res[0]["seen_date"],
@@ -66,10 +66,10 @@ class MessageHelper extends dbHelper {
         id: res[i]["id"],
         author: res[i]["author"],
         content: res[i]["content"],
-        chat: res[i]["chat"],
-        send_date: res[0]["send_date"],
-        receive_date: res[0]["receive_date"],
-        seen_date: res[0]["seen_date"],
+        chatgroup: res[i]["chatgroup"],
+        send_date: res[i]["send_date"],
+        receive_date: res[i]["receive_date"],
+        seen_date: res[i]["seen_date"],
       );
       messages.add(message);
     }

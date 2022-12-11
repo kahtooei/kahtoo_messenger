@@ -1,8 +1,8 @@
 class Message {
   int? id;
-  String? author;
+  int? author;
   String? content;
-  String? chat;
+  int? chatgroup;
   String? send_date;
   String? receive_date;
   String? seen_date;
@@ -11,7 +11,7 @@ class Message {
       {this.id,
       this.author,
       this.content,
-      this.chat,
+      this.chatgroup = null,
       this.send_date,
       this.receive_date = null,
       this.seen_date = null});
@@ -21,7 +21,7 @@ class Message {
       'id': this.id,
       'author': this.author,
       'content': this.content,
-      'chat': this.chat,
+      'chatgroup': this.chatgroup,
       'send_date': this.send_date,
       'receive_date': this.receive_date,
       'seen_date': this.seen_date,

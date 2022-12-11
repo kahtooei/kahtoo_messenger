@@ -14,7 +14,14 @@ class MessageServices {
     }
   }
 
-  static Future<bool> setOne(Message message) async {
+  static Future<Message> setOne(Message message) async {
+    Message msg = Message(
+        id: -1,
+        author: -1,
+        content: "",
+        receive_date: "",
+        seen_date: "",
+        send_date: "");
     try {
       var db = MessageHelper();
       await db.open();
@@ -22,13 +29,13 @@ class MessageServices {
       if (hasMessage) {
         // await db.updateStatus(message);
       } else {
-        await db.insert(message);
+        msg = await db.insert(message);
       }
 
       await db.close();
-      return true;
+      return msg;
     } catch (e) {
-      return false;
+      return msg;
     }
   }
 
@@ -67,8 +74,7 @@ class MessageServices {
       print("Error : ${e.toString()}");
       return Message(
           id: -1,
-          author: "",
-          chat: "",
+          author: -1,
           content: "",
           receive_date: "",
           seen_date: "",
