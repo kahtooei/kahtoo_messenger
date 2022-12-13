@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:kahtoo_messenger/dbhelper/db_helper.dart';
-import 'package:kahtoo_messenger/dbmodels/message.dart';
+import 'package:kahtoo_messenger/Database/dbhelper/db_helper.dart';
+import 'package:kahtoo_messenger/Database/dbmodels/message.dart';
 import 'package:sqflite/sqflite.dart';
 
 class MessageHelper extends dbHelper {

@@ -1,5 +1,5 @@
-import 'package:kahtoo_messenger/dbhelper/messagehelper.dart';
-import 'package:kahtoo_messenger/dbmodels/message.dart';
+import 'package:kahtoo_messenger/Database/dbhelper/messagehelper.dart';
+import 'package:kahtoo_messenger/Database/dbmodels/message.dart';
 
 class MessageServices {
   static Future<bool> setAll(List<Message> messages) async {

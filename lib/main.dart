@@ -1,7 +1,7 @@
-import 'package:kahtoo_messenger/helper/basicinfo.dart';
-import 'package:kahtoo_messenger/screens/logs_screen.dart';
-import 'package:kahtoo_messenger/screens/messages_screen.dart';
-import 'package:kahtoo_messenger/screens/setting_screen.dart';
+import 'package:kahtoo_messenger/Constants/Colors.dart';
+import 'package:kahtoo_messenger/Views/Screens/logs_screen.dart';
+import 'package:kahtoo_messenger/Views/Screens/messages_screen.dart';
+import 'package:kahtoo_messenger/Views/Screens/setting_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 
@@ -11,29 +11,27 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Kahtoo Messenger',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primaryColor: BasicInfo.getMainColor(),
+          primaryColor: ColorsRepo.getMainColor(),
           colorScheme: ColorScheme(
-              primary: BasicInfo.getMainColor(),
-              secondary: BasicInfo.getSecondColor(),
+              primary: ColorsRepo.getMainColor(),
+              secondary: ColorsRepo.getSecondColor(),
               brightness: Brightness.light,
-              onBackground: BasicInfo.getMainColor(),
-              primaryContainer: BasicInfo.getMainColor(),
+              onBackground: ColorsRepo.getMainColor(),
+              primaryContainer: ColorsRepo.getMainColor(),
               onPrimary: Colors.white,
-              onSecondary: BasicInfo.getMainColor(),
-              onError: BasicInfo.getMainColor(),
-              secondaryContainer: BasicInfo.getMainColor(),
-              error: BasicInfo.getMainColor(),
-              surface: BasicInfo.getSecondColor(),
-              onSurface: BasicInfo.getMainColor(),
-              background: BasicInfo.getMainColor())),
+              onSecondary: ColorsRepo.getMainColor(),
+              onError: ColorsRepo.getMainColor(),
+              secondaryContainer: ColorsRepo.getMainColor(),
+              error: ColorsRepo.getMainColor(),
+              surface: ColorsRepo.getSecondColor(),
+              onSurface: ColorsRepo.getMainColor(),
+              background: ColorsRepo.getMainColor())),
       home: MyMainScreen(),
     );
   }
@@ -65,7 +63,7 @@ class _MyMainScreenState extends State<MyMainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Kahtoo Messenger"),
-        backgroundColor: BasicInfo.getMainColor(),
+        backgroundColor: ColorsRepo.getMainColor(),
       ),
       body: SizedBox.expand(
         child: PageView(
@@ -87,7 +85,7 @@ class _MyMainScreenState extends State<MyMainScreen> {
           Icons.add,
           color: Colors.white,
         ),
-        backgroundColor: BasicInfo.getMainColor(),
+        backgroundColor: ColorsRepo.getMainColor(),
       ),
       bottomNavigationBar: BottomNavyBar(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -100,19 +98,19 @@ class _MyMainScreenState extends State<MyMainScreen> {
         }),
         items: [
           BottomNavyBarItem(
-            icon: Icon(Icons.message),
-            title: Text('Messages'),
-            activeColor: BasicInfo.getMainColor(),
+            icon: const Icon(Icons.message),
+            title: const Text('Messages'),
+            activeColor: ColorsRepo.getMainColor(),
           ),
           BottomNavyBarItem(
-            icon: Icon(Icons.history),
+            icon: const Icon(Icons.history),
             title: Text('History'),
-            activeColor: BasicInfo.getMainColor(),
+            activeColor: ColorsRepo.getMainColor(),
           ),
           BottomNavyBarItem(
               icon: Icon(Icons.settings),
               title: Text('Setting'),
-              activeColor: BasicInfo.getMainColor()),
+              activeColor: ColorsRepo.getMainColor()),
         ],
       ),
     );

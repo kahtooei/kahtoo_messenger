@@ -48,6 +48,6 @@ class dbHelper {
 
   Future close() async {
     print("close in Provider");
-    db.close();
+    // db.close();
   }
 }

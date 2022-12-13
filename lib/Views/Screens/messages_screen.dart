@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kahtoo_messenger/dbmodels/chatgroup.dart';
-import 'package:kahtoo_messenger/dbmodels/chatuser.dart';
-import 'package:kahtoo_messenger/dbmodels/message.dart';
-import 'package:kahtoo_messenger/dbservices/groupservice.dart';
-import 'package:kahtoo_messenger/dbservices/userservices.dart';
-import 'package:kahtoo_messenger/dbservices/messageservices.dart';
+import 'package:kahtoo_messenger/Database/dbmodels/chatgroup.dart';
+import 'package:kahtoo_messenger/Database/dbmodels/chatuser.dart';
+import 'package:kahtoo_messenger/Database/dbmodels/message.dart';
+import 'package:kahtoo_messenger/Database/dbservices/groupservice.dart';
+import 'package:kahtoo_messenger/Database/dbservices/userservices.dart';
+import 'package:kahtoo_messenger/Database/dbservices/messageservices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -29,12 +29,10 @@ class MessageScreenState extends State<MessageScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print("INIT STATE");
     firstChecking();
   }
 
   firstChecking() async {
-    print("FIRST CHECKING");
     sp = await SharedPreferences.getInstance();
     //just for development time
     late String token, username;
@@ -124,12 +122,12 @@ class MessageScreenState extends State<MessageScreen> {
   }
 
   getGroups(Map _groupsData) async {
-    List groups = _groupsData['groups'];
-    for (Map grp in groups) {
-      ChatGroup group =
-          ChatGroup(name: grp['name'], groupname: grp['groupname']);
-      await GroupServices.setOne(group);
-    }
+    // List groups = _groupsData['groups'];
+    // for (Map grp in groups) {
+    //   ChatGroup group =
+    //       ChatGroup(name: grp['name'], groupname: grp['groupname']);
+    //   await GroupServices.setOne(group);
+    // }
     channel.sink.add(json.encode({"command": "fetch"}));
   }
 
@@ -142,23 +140,14 @@ class MessageScreenState extends State<MessageScreen> {
     ChatGroup group = ChatGroup(id: -1, groupname: "", name: "");
     if (isGroupMsg) {
       Map groupData = _message['group'];
-      group =
-          await GroupServices.getChatGroupByGroupname(groupData['groupname']);
-      if (group.id! < 1) {
-        group = ChatGroup(
-            groupname: groupData['groupname'], name: groupData['name']);
-        group = await GroupServices.setOne(group);
-      }
+      group = await getGroupData(
+          groupname: groupData['groupname'], name: groupData['name']);
     }
 
     //check author of message
-    ChatUser author =
-        await UserServices.getChatUserByUsername(message['author']['username']);
-    if (author.id! < 1) {
-      author = await UserServices.setOne(ChatUser(
-          username: message['author']['username'],
-          name: message['author']['name']));
-    }
+    ChatUser author = await getUserData(
+        username: message['author']['username'],
+        name: message['author']['name']);
 
     //insert message
     try {
@@ -170,8 +159,6 @@ class MessageScreenState extends State<MessageScreen> {
         send_date: message['create_date'],
       );
       newMsg = await MessageServices.setOne(newMsg);
-      print(
-          "*********************** CREATED Message : ${newMsg.toMap()} ***********************");
     } catch (e) {
       print("Error => $e");
     }
@@ -183,7 +170,53 @@ class MessageScreenState extends State<MessageScreen> {
 
   updateGroup(Map _groupData) {}
 
-  NewMessage(Map _message) {
+  NewMessage(Map _message) async {
     //send request to get group data if it's not exist
+    ChatUser author = await getUserData(
+        username: _message['author']['username'],
+        name: _message['author']['name']);
+
+    bool isGroupMsg = _message['status'] == 3;
+    ChatGroup group = ChatGroup(id: -1, groupname: "", name: "");
+    if (isGroupMsg) {
+      group = await getGroupData(groupname: _message['groupname']);
+    }
+
+    try {
+      Message newMsg = Message(
+        id: _message['id'],
+        content: _message['content'],
+        author: author.id,
+        chatgroup: isGroupMsg ? group.id : null,
+        send_date: _message['create_date'],
+      );
+      newMsg = await MessageServices.setOne(newMsg);
+    } catch (e) {
+      print("Error => $e");
+    }
+    channel.sink.add(json.encode({
+      "command": "receive",
+      "values": {"messageID": _message['id']}
+    }));
+  }
+
+  Future<ChatGroup> getGroupData(
+      {required String groupname, String name = ""}) async {
+    ChatGroup grp = await GroupServices.getChatGroupByGroupname(groupname);
+    if (grp.id! < 1) {
+      grp = ChatGroup(groupname: groupname, name: name);
+      grp = await GroupServices.setOne(grp);
+    }
+    return grp;
+  }
+
+  Future<ChatUser> getUserData(
+      {required String username, required String name}) async {
+    ChatUser user = await UserServices.getChatUserByUsername(username);
+    if (user.id! < 1) {
+      user =
+          await UserServices.setOne(ChatUser(username: username, name: name));
+    }
+    return user;
   }
 }
