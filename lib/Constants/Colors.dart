@@ -55,7 +55,7 @@ class ColorsRepo {
       "status-txt-sent": Color(0xfffafafa),
       "status-bck-other": Color(0xff7ba6ff),
       "status-txt-other": Color(0xff014ff5),
-      "status-txt-prepare": Color(0xffcecece),
+      "progress": Colors.white,
     };
     return myColors[colorName] ?? getMainColor();
   }

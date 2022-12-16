@@ -1,5 +1,5 @@
-import 'package:kahtoo_messenger/Database/dbmodels/chatgroup.dart';
-import 'package:kahtoo_messenger/Database/dbhelper/grouphelper.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatgroup.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbhelper/grouphelper.dart';
 
 class GroupServices {
   static Future<bool> setAll(List<ChatGroup> chatGroups) async {

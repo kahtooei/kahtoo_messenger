@@ -1,5 +1,5 @@
-import 'package:kahtoo_messenger/Database/dbmodels/chatuser.dart';
-import 'package:kahtoo_messenger/Database/dbhelper/userhelper.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatuser.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbhelper/userhelper.dart';
 
 class UserServices {
   static Future<bool> setAll(List<ChatUser> chatUsers) async {

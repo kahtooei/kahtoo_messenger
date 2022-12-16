@@ -37,11 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   bottom_navy_bar: ^6.0.0
   sqflite: ^2.2.1
-  shared_preferences: ^2.0.15
   http: ^0.13.5
   web_socket_channel: ^2.2.0
-  bloc: ^8.1.0
-  flutter_bloc: ^8.1.1
+  get: ^4.6.5
+  get_storage: ^2.0.3
 
 dev_dependencies:
   flutter_test:

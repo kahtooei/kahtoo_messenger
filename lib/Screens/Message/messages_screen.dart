@@ -1,14 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kahtoo_messenger/Database/dbmodels/chatgroup.dart';
-import 'package:kahtoo_messenger/Database/dbmodels/chatuser.dart';
-import 'package:kahtoo_messenger/Database/dbmodels/message.dart';
-import 'package:kahtoo_messenger/Database/dbservices/groupservice.dart';
-import 'package:kahtoo_messenger/Database/dbservices/userservices.dart';
-import 'package:kahtoo_messenger/Database/dbservices/messageservices.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:kahtoo_messenger/Constants/Colors.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatgroup.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatuser.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbmodels/message.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbservices/groupservice.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbservices/userservices.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbservices/messageservices.dart';
+import 'package:kahtoo_messenger/Screens/Message/messageListView.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'dart:convert';
 
@@ -18,11 +18,13 @@ class MessageScreen extends StatefulWidget {
 }
 
 class MessageScreenState extends State<MessageScreen> {
-  late SharedPreferences sp;
+  final box = GetStorage();
+  List<ChatUser> users = [];
+  bool isLoading = true;
+
   late final IOWebSocketChannel channel;
   int data = 1;
   String statusMessage = "";
-  String myUsername = "m.kahtooei";
   int counter = 1;
 
   @override
@@ -33,27 +35,30 @@ class MessageScreenState extends State<MessageScreen> {
   }
 
   firstChecking() async {
-    sp = await SharedPreferences.getInstance();
+    users = await UserServices.getAllUsers();
+    setState(() {
+      isLoading = false;
+    });
     //just for development time
     late String token, username;
 
     token = "mohammad";
-    channel = IOWebSocketChannel.connect(
-      Uri.parse('ws://likerdshop.ir:7444/ws/messenger/$token/'),
-    );
-    channel.stream.listen(
-      (message) {
-        // channel.sink.close(status.goingAway);
-        Map msg = json.decode(message);
-        handleReceivedMessages(msg['message']);
-      },
-      onDone: () {
-        print("Disconnected");
-      },
-      onError: (error) {
-        print("Run OnError Method With Value : $error");
-      },
-    );
+    // channel = IOWebSocketChannel.connect(
+    //   Uri.parse('ws://likerdshop.ir:7444/ws/messenger/$token/'),
+    // );
+    // channel.stream.listen(
+    //   (message) {
+    //     // channel.sink.close(status.goingAway);
+    //     Map msg = json.decode(message);
+    //     handleReceivedMessages(msg['message']);
+    //   },
+    //   onDone: () {
+    //     print("Disconnected");
+    //   },
+    //   onError: (error) {
+    //     print("Run OnError Method With Value : $error");
+    //   },
+    // );
   }
 
   checking() async {
@@ -85,30 +90,19 @@ class MessageScreenState extends State<MessageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-            child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text("$statusMessage : $data"),
-        IconButton(
-            onPressed: () async {
-              checking();
-            },
-            icon: Icon(Icons.check)),
-        IconButton(
-            onPressed: () async {
-              MessageServices.deleteAll();
-              UserServices.deleteAll();
-              GroupServices.deleteAll();
-            },
-            icon: Icon(Icons.delete)),
-        Text(statusMessage),
-        IconButton(
-            onPressed: () async {
-              channel.sink.close(status.goingAway);
-            },
-            icon: Icon(Icons.discord)),
-      ],
-    )));
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      isLoading
+          ? CircularProgressIndicator(
+              color: ColorsRepo.getMainColor(),
+            )
+          : Expanded(
+              child: Container(
+              width: MediaQuery.of(context).size.width,
+              // height: MediaQuery.of(context).size.height - 100,
+              child: MessageListView(userList: users),
+            )),
+    ])));
   }
 
   handleReceivedMessages(Map _data) {
@@ -218,5 +212,29 @@ class MessageScreenState extends State<MessageScreen> {
           await UserServices.setOne(ChatUser(username: username, name: name));
     }
     return user;
+  }
+
+  List<Widget> getTestWidget() {
+    return [
+      Text("$statusMessage : $data"),
+      IconButton(
+          onPressed: () async {
+            checking();
+          },
+          icon: Icon(Icons.check)),
+      IconButton(
+          onPressed: () async {
+            MessageServices.deleteAll();
+            UserServices.deleteAll();
+            GroupServices.deleteAll();
+          },
+          icon: Icon(Icons.delete)),
+      Text(statusMessage),
+      IconButton(
+          onPressed: () async {
+            channel.sink.close(status.goingAway);
+          },
+          icon: Icon(Icons.discord)),
+    ];
   }
 }
