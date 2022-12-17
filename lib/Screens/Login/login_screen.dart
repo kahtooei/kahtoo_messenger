@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
+import 'package:kahtoo_messenger/API/Http/login_service.dart';
 import 'package:kahtoo_messenger/Components/Buttons/main_button.dart';
 import 'package:kahtoo_messenger/Components/Buttons/main_textbutton.dart';
+import 'package:kahtoo_messenger/Components/Error/show_error_snack.dart';
 import 'package:kahtoo_messenger/Components/TextFields/main_textfield.dart';
+import 'package:kahtoo_messenger/Constants/Addresses.dart';
 import 'package:kahtoo_messenger/Constants/Colors.dart';
-import 'package:kahtoo_messenger/Constants/Styles.dart';
+import 'package:kahtoo_messenger/Models/my_model.dart';
+import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +18,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,24 +47,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.black54,
                   fontWeight: FontWeight.bold),
             ),
-            const Padding(
-              padding: EdgeInsets.only(right: 15, left: 15, bottom: 5, top: 30),
+            Padding(
+              padding: const EdgeInsets.only(
+                  right: 15, left: 15, bottom: 5, top: 30),
               child: MainTextField(
                 hint: "Username ...",
+                controller: usernameController,
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(right: 15, left: 15, bottom: 30),
-              child: MainTextField(hint: "Password ...", isPassword: true),
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 30,
-              height: 40,
-              child: MainButton(
-                text: "Login",
-                onClicked: loginClick,
+              child: MainTextField(
+                hint: "Password ...",
+                isPassword: true,
+                controller: passwordController,
               ),
             ),
+            isLoading
+                ? CircularProgressIndicator(
+                    color: ColorsRepo.getMainColor(),
+                  )
+                : SizedBox(
+                    width: MediaQuery.of(context).size.width - 30,
+                    height: 40,
+                    child: MainButton(
+                      text: "Login",
+                      onClicked: loginClick,
+                    ),
+                  ),
             const MainTextButton(
               text: "Forget Password?",
               textColor: Colors.black54,
@@ -67,5 +85,25 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  loginClick() {}
+  loginClick() async {
+    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+      ShowErrorSnack.show("Empty Username Or Password",
+          "Enter Username And Password For Login");
+    } else {
+      setState(() {
+        isLoading = true;
+      });
+      var result = await LoginService.login(MyModel(
+          username: usernameController.text,
+          token: '',
+          password: passwordController.text));
+      setState(() {
+        isLoading = false;
+      });
+      if (result) {
+        await LocalCache.setMyInfo(result);
+        Get.offAllNamed(ScreenName.home);
+      }
+    }
+  }
 }

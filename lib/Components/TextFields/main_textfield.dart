@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kahtoo_messenger/Constants/Styles.dart';
 
 class MainTextField extends StatelessWidget {
+  final TextEditingController? controller;
   final String? hint;
   final Function(String)? onChanged;
   final bool? isPassword;
@@ -9,6 +10,7 @@ class MainTextField extends StatelessWidget {
     super.key,
     this.hint,
     this.onChanged,
+    this.controller,
     this.isPassword = false,
   });
 
@@ -17,6 +19,7 @@ class MainTextField extends StatelessWidget {
     return SizedBox(
       height: 50,
       child: TextField(
+        controller: controller,
         onChanged:
             onChanged != null ? (newValue) => onChanged!(newValue) : null,
         style: StylesRepo.getStyle(style_name: "mainTextField"),

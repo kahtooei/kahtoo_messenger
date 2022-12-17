@@ -3,6 +3,7 @@ import 'package:get/route_manager.dart';
 import 'package:kahtoo_messenger/API/WS/WebSocketConnect.dart';
 import 'package:kahtoo_messenger/Constants/Addresses.dart';
 import 'package:kahtoo_messenger/Constants/Colors.dart';
+import 'package:kahtoo_messenger/Models/my_model.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -33,9 +34,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   checkStatus() async {
-    var myInfo = await LocalCache.getMyInfo();
-    if (myInfo[LocalCache.usernameKey] != null &&
-        myInfo[LocalCache.tokenKey] != null) {
+    MyModel myInfo = await LocalCache.getMyInfo();
+    if (myInfo.isValidate()) {
       WebSocketConnect.startConnection();
       Get.offAndToNamed(ScreenName.home);
     } else {

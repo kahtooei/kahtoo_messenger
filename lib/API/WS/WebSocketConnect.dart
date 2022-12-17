@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:kahtoo_messenger/Constants/Addresses.dart';
+import 'package:kahtoo_messenger/Models/my_model.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -22,10 +23,9 @@ class WebSocketConnect {
       StreamController<Map>.broadcast();
 
   static startConnection() async {
-    Map myInfo = await LocalCache.getMyInfo();
+    MyModel myInfo = await LocalCache.getMyInfo();
     _channel = IOWebSocketChannel.connect(
-      Uri.parse(
-          '${AddressRepo.getSocketAddress()}${myInfo[LocalCache.tokenKey]}/'),
+      Uri.parse('${AddressRepo.getSocketAddress()}${myInfo.token}/'),
     );
     _channel.stream.listen(
       (message) {

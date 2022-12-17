@@ -1,9 +1,9 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import '../../Constants/Colors.dart';
-import '../logs_screen.dart';
+import '../Log/logs_screen.dart';
 import '../Message/messages_screen.dart';
-import '../setting_screen.dart';
+import '../Setting/setting_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
