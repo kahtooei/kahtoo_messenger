@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
       WebSocketConnect.startConnection();
       Get.offAndToNamed(ScreenName.home);
     } else {
-      // Get.offAndToNamed(ScreenName.welcome);
+      Get.offAndToNamed(ScreenName.welcome);
       debugPrint("it's not login");
     }
   }

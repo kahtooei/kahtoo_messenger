@@ -1,6 +1,8 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import '../../Constants/Colors.dart';
+import '../../Models/my_model.dart';
 import '../Log/logs_screen.dart';
 import '../Message/messages_screen.dart';
 import '../Setting/setting_screen.dart';
@@ -49,7 +51,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () async {
+          MyModel m = await LocalCache.getMyInfo();
+          debugPrint(
+              "username : ${m.username} , password : ${m.password} , fullName : ${m.fullName} , token : ${m.token}");
+        },
         tooltip: 'New',
         backgroundColor: ColorsRepo.getMainColor(),
         child: const Icon(

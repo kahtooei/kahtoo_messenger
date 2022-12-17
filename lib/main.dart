@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: ScreenName.register, page: () => const RegisterScreen()),
         GetPage(name: ScreenName.welcome, page: () => const WelcomeScreen()),
       ],
-      initialRoute: ScreenName.welcome,
+      initialRoute: ScreenName.splash,
     );
   }
 }

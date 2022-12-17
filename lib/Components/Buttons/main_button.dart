@@ -18,7 +18,6 @@ class MainButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("BackgroundColor ==> $backgroundColor");
     return ElevatedButton(
         onPressed: onClicked,
         style: ElevatedButton.styleFrom(

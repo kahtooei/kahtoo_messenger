@@ -117,7 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           username: usernameController.text,
           password: passwordController.text,
           token: '-1'));
-      if (result) {
+      if (result.username.isNotEmpty) {
         await LocalCache.setMyInfo(result);
         Get.offAllNamed(ScreenName.home);
       } else {

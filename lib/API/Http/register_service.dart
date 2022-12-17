@@ -22,7 +22,7 @@ class RegisterService {
           'fullName': info.fullName,
         });
         final body = json.decode(response.body);
-        if (body['responseStatus'] == "OK") {
+        if (body['statusCode'] == 200) {
           String token = body['token'];
           return MyModel(
               username: info.username,
@@ -30,17 +30,16 @@ class RegisterService {
               fullName: info.fullName,
               password: info.password);
         } else {
-          ShowErrorSnack.show(
-              'Incorrect Info', 'Username Or Password Incorrect');
-          return false;
+          ShowErrorSnack.show('Incorrect Info', body['error']);
+          return MyModel(username: '');
         }
       } else {
         ShowErrorSnack.show('Not Available', 'Service Not Available');
-        return false;
+        return MyModel(username: '');
       }
     } catch (e) {
       ShowErrorSnack.show('No Internet', 'Internet Connection Fail');
-      return false;
+      return MyModel(username: '');
     }
   }
 }

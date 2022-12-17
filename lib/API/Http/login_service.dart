@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:kahtoo_messenger/Components/Error/show_error_snack.dart';
 import 'package:kahtoo_messenger/Constants/Addresses.dart';
@@ -22,26 +23,25 @@ class LoginService {
           'password': info.password,
         });
         final body = json.decode(response.body);
-        if (body['responseStatus'] == "OK") {
+        if (body['statusCode'] == 200) {
           String token = body['token'];
-          String fullName = body['token'];
+          String fullName = body['fullName'];
           return MyModel(
               username: info.username,
               token: token,
               fullName: fullName,
               password: info.password);
         } else {
-          ShowErrorSnack.show(
-              'Incorrect Info', 'Username Or Password Incorrect');
-          return false;
+          ShowErrorSnack.show('Incorrect Info', body['error']);
+          return MyModel(username: '');
         }
       } else {
         ShowErrorSnack.show('Not Available', 'Service Not Available');
-        return false;
+        return MyModel(username: '');
       }
     } catch (e) {
       ShowErrorSnack.show('No Internet', 'Internet Connection Fail');
-      return false;
+      return MyModel(username: '');
     }
   }
 }

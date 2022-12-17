@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         isLoading = false;
       });
-      if (result) {
+      if (result.username.isNotEmpty) {
         await LocalCache.setMyInfo(result);
         Get.offAllNamed(ScreenName.home);
       }
