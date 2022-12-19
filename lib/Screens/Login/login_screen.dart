@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       if (result.username.isNotEmpty) {
         await LocalCache.setMyInfo(result);
-        Get.offAllNamed(ScreenName.home);
+        Get.offAllNamed(ScreenName.splash);
       }
     }
   }

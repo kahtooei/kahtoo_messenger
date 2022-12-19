@@ -1,7 +1,12 @@
 import 'dart:io';
 
+import 'package:kahtoo_messenger/Models/chat_model.dart';
+import 'package:kahtoo_messenger/Models/my_model.dart';
+import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbhelper/db_helper.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatuser.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbmodels/message.dart';
+import 'package:kahtoo_messenger/Storage/Database/dbservices/messageservices.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ChatHelper extends dbHelper {
@@ -27,6 +32,46 @@ class ChatHelper extends dbHelper {
           id: res[0]["id"], username: res[0]["username"], name: res[0]["name"]);
     }
     return chatUser;
+  }
+
+  Future<List<ChatModel>> selectUsersChatModel() async {
+    List<ChatModel> chatList = [];
+    MyModel info = await LocalCache.getMyInfo();
+    List<ChatUser> users = await selectAll();
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    for (ChatUser user in users) {
+      if (user.id != info.id) {
+        Message message = await MessageServices.getLastUserMessage(user.id!);
+        if (message.id! > 0) {
+          DateTime parsedDate = DateTime.parse(message.send_date!).toLocal();
+          String MessageDate = "";
+          if (today.compareTo(parsedDate) < 0) {
+            MessageDate = "${parsedDate.hour}:${parsedDate.minute}";
+          } else {
+            MessageDate =
+                "${parsedDate.year}/${parsedDate.month}/${parsedDate.day}";
+          }
+          chatList.add(ChatModel(
+              id: user.id,
+              name: user.name,
+              username: user.username,
+              lastMessage: message.content,
+              lastMessageDate: MessageDate,
+              avatarURL:
+                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"));
+        } else {
+          chatList.add(ChatModel(
+              id: user.id,
+              name: user.name,
+              lastMessage: "",
+              lastMessageDate: "",
+              avatarURL:
+                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"));
+        }
+      }
+    }
+    return chatList;
   }
 
   Future<bool> hasChatUsername(String _username) async {

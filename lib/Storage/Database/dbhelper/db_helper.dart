@@ -4,7 +4,7 @@ import 'package:path/path.dart';
 class dbHelper {
   late Database db;
   late String _path;
-  String _createUserTable = '''
+  final String _createUserTable = '''
                   create table chatuser ( 
                       id integer primary key autoincrement,
                       username text UNIQUE not null, 
@@ -12,7 +12,7 @@ class dbHelper {
                       )
                   ''';
 
-  String _createGroupTable = '''
+  final String _createGroupTable = '''
                   create table chatgroup ( 
                       id integer primary key autoincrement,
                       groupname text UNIQUE not null, 
@@ -20,16 +20,18 @@ class dbHelper {
                       )
                   ''';
 
-  String _createMessagesTable = '''
+  final String _createMessagesTable = '''
                   create table messages ( 
                       id integer UNIQUE not null,
                       author int not null,
                       content text not null,
                       chatgroup int,
+                      receiver int,
                       send_date not null,
                       receive_date text,
                       seen_date text,
                       FOREIGN KEY(author) REFERENCES chatuser(id),
+                      FOREIGN KEY(receiver) REFERENCES chatuser(id),
                       FOREIGN KEY(chatgroup) REFERENCES chatgroup(id)
                       )
                   ''';

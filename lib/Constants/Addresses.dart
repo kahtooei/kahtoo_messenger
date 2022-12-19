@@ -29,4 +29,5 @@ class ScreenName {
   static String setting = '/setting';
   static String splash = '/splash';
   static String welcome = '/welcome';
+  static String chat = '/chat';
 }

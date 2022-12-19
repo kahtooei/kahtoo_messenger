@@ -1,3 +1,4 @@
+import 'package:kahtoo_messenger/Models/chat_model.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatuser.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbhelper/userhelper.dart';
 
@@ -100,6 +101,18 @@ class UserServices {
       var db = ChatHelper();
       await db.open();
       List<ChatUser> chatUsers = await db.selectAll();
+      await db.close();
+      return chatUsers;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<List<ChatModel>> getAllUsersChatModel() async {
+    try {
+      var db = ChatHelper();
+      await db.open();
+      List<ChatModel> chatUsers = await db.selectUsersChatModel();
       await db.close();
       return chatUsers;
     } catch (e) {

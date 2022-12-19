@@ -26,6 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         color: ColorsRepo.getColors(colorName: "mygrey"),
         child: Column(
@@ -119,7 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           token: '-1'));
       if (result.username.isNotEmpty) {
         await LocalCache.setMyInfo(result);
-        Get.offAllNamed(ScreenName.home);
+        Get.offAllNamed(ScreenName.splash);
       } else {
         setState(() {
           isLoading = false;

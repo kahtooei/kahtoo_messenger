@@ -35,6 +35,21 @@ class StylesRepo {
           fontSize: 14,
           fontWeight: FontWeight.w600,
           fontFamily: FontsRepo.getFontName()),
+      'title': TextStyle(
+          color: Colors.black87,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          fontFamily: FontsRepo.getFontName()),
+      'subtitle': TextStyle(
+          color: Colors.black54,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          fontFamily: FontsRepo.getFontName()),
+      'timestamp': TextStyle(
+          color: Colors.black45,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          fontFamily: FontsRepo.getFontName()),
     };
     return styles[style_name] ?? const TextStyle();
   }

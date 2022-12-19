@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:kahtoo_messenger/Constants/Addresses.dart';
 import 'package:kahtoo_messenger/Models/my_model.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
@@ -18,21 +17,22 @@ class WebSocketConnect {
   WebSocketConnect._();
 
   static bool isConnected = false;
+  static int _tryCount = 0;
   static late IOWebSocketChannel _channel;
   static StreamController<Map> msgStreamController =
       StreamController<Map>.broadcast();
 
   static startConnection() async {
+    print("Start Socket Connection To ==>");
     MyModel myInfo = await LocalCache.getMyInfo();
+    print("${AddressRepo.getSocketAddress()}${myInfo.token}/");
     _channel = IOWebSocketChannel.connect(
       Uri.parse('${AddressRepo.getSocketAddress()}${myInfo.token}/'),
     );
     _channel.stream.listen(
       (message) {
-        // channel.sink.close(status.goingAway);
-        isConnected = true;
         Map msg = json.decode(message);
-        // handleReceivedMessages(msg['message']);
+        _handleReceivedMessages(msg['message']);
       },
       onDone: () {
         isConnected = false;
@@ -44,21 +44,26 @@ class WebSocketConnect {
     );
   }
 
-  handleReceivedMessages(Map _data) {
+  static _handleReceivedMessages(Map _data) {
+    print("Received Data ==> $_data");
     Map functionsList = {
-      'groups': getGroups,
-      "fetch_message": fetchMessage,
-      "group_data": updateGroup,
-      "new_message": newMessage
+      'groups': _getGroups,
+      "fetch_message": _fetchMessage,
+      "group_data": _updateGroup,
+      "new_message": _newMessage
     };
     functionsList[_data['type_data']](_data);
   }
 
-  getGroups(Map _groupsData) async {
+  static _getGroups(Map _groupsData) async {
+    isConnected = true;
+    _tryCount = 0;
     _channel.sink.add(json.encode({"command": "fetch"}));
+    //save Groups Data If Not Saved
+    //msgStreamController.sink.add({'type': 'groupData'});  //BroadCast Group Data
   }
 
-  fetchMessage(Map _message) async {
+  static _fetchMessage(Map _message) async {
     //get Message Body
     Map message = _message['message'];
 
@@ -67,12 +72,12 @@ class WebSocketConnect {
     ChatGroup group = ChatGroup(id: -1, groupname: "", name: "");
     if (isGroupMsg) {
       Map groupData = _message['group'];
-      group = await getGroupData(
+      group = await _getGroupData(
           groupname: groupData['groupname'], name: groupData['name']);
     }
 
     //check author of message
-    ChatUser author = await getUserData(
+    ChatUser author = await _getUserData(
         username: message['author']['username'],
         name: message['author']['name']);
 
@@ -93,20 +98,23 @@ class WebSocketConnect {
       "command": "receive",
       "values": {"messageID": _message['message']['id']}
     }));
+    //msgStreamController.sink.add({'type': 'fetchMessage'});  //BroadCast Fetched Message Data
   }
 
-  updateGroup(Map _groupData) {}
+  static _updateGroup(Map _groupData) {}
 
-  newMessage(Map _message) async {
+  static _newMessage(Map _message) async {
+    print("MY MESSAGE --->");
+    print("$_message");
     //send request to get group data if it's not exist
-    ChatUser author = await getUserData(
+    ChatUser author = await _getUserData(
         username: _message['author']['username'],
         name: _message['author']['name']);
 
-    bool isGroupMsg = _message['status'] == 3;
+    bool isGroupMsg = _message['status'] == 2;
     ChatGroup group = ChatGroup(id: -1, groupname: "", name: "");
     if (isGroupMsg) {
-      group = await getGroupData(groupname: _message['groupname']);
+      group = await _getGroupData(groupname: _message['groupname']);
     }
 
     try {
@@ -125,9 +133,22 @@ class WebSocketConnect {
       "command": "receive",
       "values": {"messageID": _message['id']}
     }));
+    MyModel info = await LocalCache.getMyInfo();
+    DateTime datetime = DateTime.parse(_message['create_date']).toLocal();
+    msgStreamController.sink.add({
+      'type': 'message',
+      'author': author.username,
+      'isGroup': isGroupMsg,
+      'id': _message['id'],
+      'content': _message['content'],
+      'isMe': info.username == author.username,
+      'date': DateTime(datetime.year, datetime.month, datetime.day),
+      'time':
+          "${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')}"
+    }); //BroadCast New Message Data
   }
 
-  Future<ChatUser> getUserData(
+  static Future<ChatUser> _getUserData(
       {required String username, required String name}) async {
     ChatUser user = await UserServices.getChatUserByUsername(username);
     if (user.id! < 1) {
@@ -137,7 +158,29 @@ class WebSocketConnect {
     return user;
   }
 
-  Future<ChatGroup> getGroupData(
+  static seenMessage(int messageID) {
+    if (isConnected) {
+      _channel.sink.add(json.encode({
+        "command": "seen",
+        "values": {"messageID": messageID}
+      }));
+      //set seen date in local database
+    }
+  }
+
+  static sendMessage(String content, String receiver, bool isGroup) {
+    if (isConnected && content.isNotEmpty) {
+      String temp = isGroup ? "groupname" : "username";
+      _channel.sink.add(json.encode({
+        "command": "send",
+        "message": content,
+        "values": {temp: receiver}
+      }));
+      //set seen date in local database
+    }
+  }
+
+  static Future<ChatGroup> _getGroupData(
       {required String groupname, String name = ""}) async {
     ChatGroup grp = await GroupServices.getChatGroupByGroupname(groupname);
     if (grp.id! < 1) {

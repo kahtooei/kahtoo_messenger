@@ -4,6 +4,7 @@ import 'package:kahtoo_messenger/Models/my_model.dart';
 class LocalCache {
   LocalCache._();
 
+  static const String idKey = "id";
   static const String usernameKey = "username";
   static const String tokenKey = "token";
   static const String fullNameKey = "fullName";
@@ -16,6 +17,7 @@ class LocalCache {
     info.token = box.read(tokenKey);
     info.fullName = box.read(fullNameKey);
     info.password = box.read(passwordKey);
+    info.id = box.read(idKey);
     return info;
   }
 
@@ -25,6 +27,11 @@ class LocalCache {
     await box.write(tokenKey, info.token);
     await box.write(fullNameKey, info.fullName);
     await box.write(passwordKey, info.password);
+  }
+
+  static setMyInfoID(int id) async {
+    final box = GetStorage();
+    await box.write(idKey, id);
   }
 
   static deleteMyInfo() async {

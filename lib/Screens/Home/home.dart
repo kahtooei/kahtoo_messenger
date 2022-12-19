@@ -52,9 +52,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          MyModel m = await LocalCache.getMyInfo();
-          debugPrint(
-              "username : ${m.username} , password : ${m.password} , fullName : ${m.fullName} , token : ${m.token}");
+          LocalCache.deleteMyInfo();
         },
         tooltip: 'New',
         backgroundColor: ColorsRepo.getMainColor(),
