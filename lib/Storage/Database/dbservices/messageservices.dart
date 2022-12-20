@@ -104,6 +104,41 @@ class MessageServices {
     }
   }
 
+  static Future<Message> getLastGroupMessage(int groupID) async {
+    try {
+      var db = MessageHelper();
+      await db.open();
+      Message message = await db.lastGroupMessage(groupID);
+      await db.close();
+      return message;
+    } catch (e) {
+      print("Error : ${e.toString()}");
+      return Message(
+          id: -1,
+          author: -1,
+          content: "",
+          receive_date: "",
+          seen_date: "",
+          send_date: "");
+    }
+  }
+
+  static Future<int> getUserUnreadMessageCount(int userID) async {
+    int count = 0;
+    var db = MessageHelper();
+    await db.open();
+    count = await db.userUnreadMessage(userID);
+    return count;
+  }
+
+  static Future<int> getGroupUnreadMessageCount(int groupID) async {
+    int count = 0;
+    var db = MessageHelper();
+    await db.open();
+    count = await db.groupUnreadMessage(groupID);
+    return count;
+  }
+
   static Future<List<Message>> getAllMessage() async {
     try {
       var db = MessageHelper();
@@ -123,6 +158,31 @@ class MessageServices {
       var db = MessageHelper();
       await db.open();
       List<Message> messages = await db.selectUserMessages(userID);
+      for (Message m in messages) {
+        DateTime datetime = DateTime.parse(m.send_date!).toLocal();
+        DateTime date = DateTime(datetime.year, datetime.month, datetime.day);
+        chatMessages.add(ChatMessageModel(
+            id: m.id,
+            content: m.content,
+            isMe: m.author == info.id,
+            date: date,
+            time:
+                "${datetime.hour.toString().padLeft(2, "0")}:${datetime.minute.toString().padLeft(2, "0")}"));
+      }
+      await db.close();
+      return chatMessages;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<List<ChatMessageModel>> getGroupChatMessage(int groupID) async {
+    try {
+      MyModel info = await LocalCache.getMyInfo();
+      List<ChatMessageModel> chatMessages = [];
+      var db = MessageHelper();
+      await db.open();
+      List<Message> messages = await db.selectGroupMessages(groupID);
       for (Message m in messages) {
         DateTime datetime = DateTime.parse(m.send_date!).toLocal();
         DateTime date = DateTime(datetime.year, datetime.month, datetime.day);

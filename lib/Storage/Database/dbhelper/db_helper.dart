@@ -37,7 +37,6 @@ class dbHelper {
                   ''';
 
   Future open({String dbname: "kahtooMessenger.db"}) async {
-    print("open in Provider");
     var dbpath = await getDatabasesPath();
     _path = join(dbpath, dbname);
     db = await openDatabase(_path, version: 1,
@@ -49,7 +48,6 @@ class dbHelper {
   }
 
   Future close() async {
-    print("close in Provider");
     // db.close();
   }
 }

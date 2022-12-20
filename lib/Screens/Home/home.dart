@@ -1,9 +1,11 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:kahtoo_messenger/Screens/Home/newChat_dialog.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import '../../Constants/Colors.dart';
 import '../../Models/my_model.dart';
-import '../Log/logs_screen.dart';
+import '../Groups/group_screen.dart';
 import '../Message/messages_screen.dart';
 import '../Setting/setting_screen.dart';
 
@@ -45,14 +47,19 @@ class _HomePageState extends State<HomePage> {
           },
           children: <Widget>[
             MessageScreen(),
-            LogsScreen(),
+            GroupScreen(),
             SettingScreen(),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          LocalCache.deleteMyInfo();
+        onPressed: () {
+          Get.dialog(
+              WillPopScope(
+                onWillPop: () async => true,
+                child: NewChatDialog(),
+              ),
+              barrierDismissible: false);
         },
         tooltip: 'New',
         backgroundColor: ColorsRepo.getMainColor(),
@@ -77,8 +84,8 @@ class _HomePageState extends State<HomePage> {
             activeColor: ColorsRepo.getMainColor(),
           ),
           BottomNavyBarItem(
-            icon: const Icon(Icons.history),
-            title: const Text('History'),
+            icon: const Icon(Icons.group),
+            title: const Text('Groups'),
             activeColor: ColorsRepo.getMainColor(),
           ),
           BottomNavyBarItem(

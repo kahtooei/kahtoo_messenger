@@ -3,6 +3,7 @@ import 'package:get/route_manager.dart';
 import 'package:kahtoo_messenger/API/WS/WebSocketConnect.dart';
 import 'package:kahtoo_messenger/Constants/Addresses.dart';
 import 'package:kahtoo_messenger/Constants/Colors.dart';
+import 'package:kahtoo_messenger/Constants/Config.dart';
 import 'package:kahtoo_messenger/Models/my_model.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbservices/userservices.dart';
@@ -56,5 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
       user = await UserServices.setOne(user);
     }
     LocalCache.setMyInfoID(user.id!);
+    info.id = user.id!;
+    Config.myInfo = info;
   }
 }

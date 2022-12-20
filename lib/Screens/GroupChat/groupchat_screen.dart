@@ -14,15 +14,16 @@ import 'package:kahtoo_messenger/Storage/Database/dbservices/messageservices.dar
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../Storage/Database/dbmodels/message.dart';
+import 'groupchat_listview.dart';
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+class GroupChatScreen extends StatefulWidget {
+  const GroupChatScreen({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<GroupChatScreen> createState() => _GroupChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _GroupChatScreenState extends State<GroupChatScreen> {
   ScrollController scrollController = ScrollController();
   StreamController chatStream = WebSocketConnect.msgStreamController;
   late StreamSubscription subscription;
@@ -41,19 +42,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   loadChats() async {
     MyModel info = await LocalCache.getMyInfo();
-    chats = await MessageServices.getUserChatMessage(chat.id!);
+    chats = await MessageServices.getGroupChatMessage(chat.id!);
 
     setState(() {
       isLoading = false;
     });
 
     subscription = chatStream.stream.listen((event) {
-      if (event['type'] == "message" &&
-          ((event['author'] == chat.username &&
-                  event['receiver'] == info.username) ||
-              (event['author'] == info.username &&
-                  event['receiver'] == chat.username)) &&
-          event['isGroup'] == false) {
+      if (event['type'] == "groupMessage" &&
+          event['isGroup'] == true &&
+          event['receiver'] == chat.username) {
         chats.add(ChatMessageModel(
             id: event['id'],
             content: event['content'],
@@ -62,7 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
             time: event['time']));
         setState(() {});
         refreshScroll();
-        if (event['author'] == chat.username) {
+        if (event['author'] != info.username) {
           WebSocketConnect.seenMessage(event['id']);
         }
       }
@@ -96,13 +94,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     height: double.infinity,
-                    child: ChatsListView(
+                    child: GroupChatListView(
                         chats: chats, controller: scrollController),
                   ),
                 ),
                 MessageBar(
                   onSend: (text) {
-                    WebSocketConnect.sendMessage(text, chat.username!, false);
+                    WebSocketConnect.sendMessage(text, chat.username!, true);
                   },
                 ),
               ],

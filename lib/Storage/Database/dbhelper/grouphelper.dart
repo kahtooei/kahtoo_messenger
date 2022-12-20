@@ -4,6 +4,12 @@ import 'package:kahtoo_messenger/Storage/Database/dbhelper/db_helper.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatgroup.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../../Models/chat_model.dart';
+import '../../../Models/my_model.dart';
+import '../../Cache/local_cache.dart';
+import '../dbmodels/message.dart';
+import '../dbservices/messageservices.dart';
+
 class ChatHelper extends dbHelper {
   String _tableName = "chatgroup";
 
@@ -86,6 +92,47 @@ class ChatHelper extends dbHelper {
       chatGroups.add(chatGroup);
     }
     return chatGroups;
+  }
+
+  Future<List<ChatModel>> selectGroupsChatModel() async {
+    List<ChatModel> chatList = [];
+    MyModel info = await LocalCache.getMyInfo();
+    List<ChatGroup> groups = await selectAll();
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    for (ChatGroup group in groups) {
+      Message message = await MessageServices.getLastGroupMessage(group.id!);
+      int unReadMessageCount =
+          await MessageServices.getGroupUnreadMessageCount(group.id!);
+      if (message.id! > 0) {
+        DateTime parsedDate = DateTime.parse(message.send_date!).toLocal();
+        String MessageDate = "";
+        if (today.compareTo(parsedDate) < 0) {
+          MessageDate = "${parsedDate.hour}:${parsedDate.minute}";
+        } else {
+          MessageDate =
+              "${parsedDate.year}/${parsedDate.month}/${parsedDate.day}";
+        }
+        chatList.add(ChatModel(
+            id: group.id,
+            name: group.name,
+            username: group.groupname,
+            unReadCount: unReadMessageCount,
+            lastMessage: message.content,
+            lastMessageDate: MessageDate,
+            avatarURL: "https://cdn-icons-png.flaticon.com/512/25/25437.png"));
+      } else {
+        chatList.add(ChatModel(
+            id: group.id,
+            name: group.name,
+            username: group.groupname,
+            unReadCount: unReadMessageCount,
+            lastMessage: "",
+            lastMessageDate: "",
+            avatarURL: "https://cdn-icons-png.flaticon.com/512/25/25437.png"));
+      }
+    }
+    return chatList;
   }
 
   Future<ChatGroup> updateName(ChatGroup chatGroup) async {

@@ -43,6 +43,8 @@ class ChatHelper extends dbHelper {
     for (ChatUser user in users) {
       if (user.id != info.id) {
         Message message = await MessageServices.getLastUserMessage(user.id!);
+        int unReadMessageCount =
+            await MessageServices.getUserUnreadMessageCount(user.id!);
         if (message.id! > 0) {
           DateTime parsedDate = DateTime.parse(message.send_date!).toLocal();
           String MessageDate = "";
@@ -56,6 +58,7 @@ class ChatHelper extends dbHelper {
               id: user.id,
               name: user.name,
               username: user.username,
+              unReadCount: unReadMessageCount,
               lastMessage: message.content,
               lastMessageDate: MessageDate,
               avatarURL:
@@ -64,6 +67,8 @@ class ChatHelper extends dbHelper {
           chatList.add(ChatModel(
               id: user.id,
               name: user.name,
+              username: user.username,
+              unReadCount: unReadMessageCount,
               lastMessage: "",
               lastMessageDate: "",
               avatarURL:

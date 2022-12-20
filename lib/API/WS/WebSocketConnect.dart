@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:kahtoo_messenger/Components/Error/show_error_snack.dart';
 import 'package:kahtoo_messenger/Constants/Addresses.dart';
 import 'package:kahtoo_messenger/Models/my_model.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import 'package:web_socket_channel/io.dart';
 
+import '../../Constants/Config.dart';
 import '../../Storage/Database/dbmodels/chatgroup.dart';
 import '../../Storage/Database/dbmodels/chatuser.dart';
 import '../../Storage/Database/dbmodels/message.dart';
@@ -22,12 +24,10 @@ class WebSocketConnect {
   static StreamController<Map> msgStreamController =
       StreamController<Map>.broadcast();
 
+  //Start Connection To WS
   static startConnection() async {
-    print("Start Socket Connection To ==>");
-    MyModel myInfo = await LocalCache.getMyInfo();
-    print("${AddressRepo.getSocketAddress()}${myInfo.token}/");
     _channel = IOWebSocketChannel.connect(
-      Uri.parse('${AddressRepo.getSocketAddress()}${myInfo.token}/'),
+      Uri.parse('${AddressRepo.getSocketAddress()}${Config.myInfo.token}/'),
     );
     _channel.stream.listen(
       (message) {
@@ -59,13 +59,23 @@ class WebSocketConnect {
     isConnected = true;
     _tryCount = 0;
     _channel.sink.add(json.encode({"command": "fetch"}));
-    //save Groups Data If Not Saved
+    List groupsList = _groupsData['groups'];
+    for (Map group in groupsList) {
+      ChatGroup chatGroup =
+          ChatGroup(groupname: group['groupname'], name: group['name']);
+      GroupServices.setOne(chatGroup);
+    }
     //msgStreamController.sink.add({'type': 'groupData'});  //BroadCast Group Data
   }
 
   static _fetchMessage(Map _message) async {
     //get Message Body
     Map message = _message['message'];
+
+    //check author of message
+    ChatUser author = await _getUserData(
+        username: message['author']['username'],
+        name: message['author']['name']);
 
     //check group message
     bool isGroupMsg = _message['group'] != null;
@@ -76,10 +86,12 @@ class WebSocketConnect {
           groupname: groupData['groupname'], name: groupData['name']);
     }
 
-    //check author of message
-    ChatUser author = await _getUserData(
-        username: message['author']['username'],
-        name: message['author']['name']);
+    //check receiver of message
+    ChatUser receiver = ChatUser(id: -1);
+    if (!isGroupMsg && _message['receiver'] != Config.myInfo.username) {
+      receiver = await _getUserData(
+          username: message['receiver'], name: message['receiver']);
+    }
 
     //insert message
     try {
@@ -88,6 +100,7 @@ class WebSocketConnect {
         content: message['content'],
         author: author.id,
         chatgroup: isGroupMsg ? group.id : null,
+        receiver: isGroupMsg ? null : receiver.id,
         send_date: message['create_date'],
       );
       newMsg = await MessageServices.setOne(newMsg);
@@ -98,14 +111,24 @@ class WebSocketConnect {
       "command": "receive",
       "values": {"messageID": _message['message']['id']}
     }));
-    //msgStreamController.sink.add({'type': 'fetchMessage'});  //BroadCast Fetched Message Data
+    DateTime datetime = DateTime.parse(message['create_date']).toLocal();
+    msgStreamController.sink.add({
+      'type': 'message',
+      'author': author.username,
+      'receiver': receiver.username ?? '',
+      'isGroup': isGroupMsg,
+      'id': message['id'],
+      'content': message['content'],
+      'isMe': Config.myInfo.username == author.username,
+      'date': DateTime(datetime.year, datetime.month, datetime.day),
+      'time':
+          "${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')}"
+    }); //BroadCast Fetched Message Data
   }
 
   static _updateGroup(Map _groupData) {}
 
   static _newMessage(Map _message) async {
-    print("MY MESSAGE --->");
-    print("$_message");
     //send request to get group data if it's not exist
     ChatUser author = await _getUserData(
         username: _message['author']['username'],
@@ -117,12 +140,20 @@ class WebSocketConnect {
       group = await _getGroupData(groupname: _message['groupname']);
     }
 
+    //check receiver of message
+    ChatUser receiver = ChatUser(id: -1);
+    if (!isGroupMsg) {
+      receiver = await _getUserData(
+          username: _message['receiver'], name: _message['receiver']);
+    }
+
     try {
       Message newMsg = Message(
         id: _message['id'],
         content: _message['content'],
         author: author.id,
         chatgroup: isGroupMsg ? group.id : null,
+        receiver: isGroupMsg ? null : receiver.id,
         send_date: _message['create_date'],
       );
       newMsg = await MessageServices.setOne(newMsg);
@@ -133,15 +164,15 @@ class WebSocketConnect {
       "command": "receive",
       "values": {"messageID": _message['id']}
     }));
-    MyModel info = await LocalCache.getMyInfo();
     DateTime datetime = DateTime.parse(_message['create_date']).toLocal();
     msgStreamController.sink.add({
-      'type': 'message',
+      'type': isGroupMsg ? 'groupMessage' : 'message',
       'author': author.username,
+      'receiver': isGroupMsg ? group.groupname : receiver.username,
       'isGroup': isGroupMsg,
       'id': _message['id'],
       'content': _message['content'],
-      'isMe': info.username == author.username,
+      'isMe': Config.myInfo.username == author.username,
       'date': DateTime(datetime.year, datetime.month, datetime.day),
       'time':
           "${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')}"
@@ -177,6 +208,8 @@ class WebSocketConnect {
         "values": {temp: receiver}
       }));
       //set seen date in local database
+    } else {
+      ShowErrorSnack.show("No Internet", "You Are Disconnect");
     }
   }
 

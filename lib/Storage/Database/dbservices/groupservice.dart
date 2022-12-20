@@ -1,6 +1,8 @@
 import 'package:kahtoo_messenger/Storage/Database/dbmodels/chatgroup.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbhelper/grouphelper.dart';
 
+import '../../../Models/chat_model.dart';
+
 class GroupServices {
   static Future<bool> setAll(List<ChatGroup> chatGroups) async {
     try {
@@ -25,7 +27,6 @@ class GroupServices {
       } else {
         createdGroup = await db.insert(chatGroup);
       }
-
       await db.close();
       return createdGroup;
     } catch (e) {
@@ -92,6 +93,18 @@ class GroupServices {
     } catch (e) {
       print("Error : ${e.toString()}");
       return ChatGroup(id: -1, name: "", groupname: "");
+    }
+  }
+
+  static Future<List<ChatModel>> getAllGroupsChatModel() async {
+    try {
+      var db = ChatHelper();
+      await db.open();
+      List<ChatModel> chatGroups = await db.selectGroupsChatModel();
+      await db.close();
+      return chatGroups;
+    } catch (e) {
+      return [];
     }
   }
 

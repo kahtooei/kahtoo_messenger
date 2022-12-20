@@ -5,10 +5,10 @@ import 'package:kahtoo_messenger/Constants/Colors.dart';
 import 'package:kahtoo_messenger/Constants/Styles.dart';
 import 'package:kahtoo_messenger/Models/chat_model.dart';
 
-class MessageListItem extends StatelessWidget {
+class GroupListItem extends StatelessWidget {
   final ChatModel chat;
 
-  const MessageListItem({super.key, required this.chat});
+  const GroupListItem({super.key, required this.chat});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class MessageListItem extends StatelessWidget {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)))),
         onPressed: () {
-          Get.toNamed(ScreenName.chat, arguments: {'chat': chat});
+          Get.toNamed(ScreenName.groupchat, arguments: {'chat': chat});
         },
         child: Row(
           children: [
