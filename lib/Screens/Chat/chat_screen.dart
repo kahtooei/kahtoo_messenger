@@ -4,6 +4,7 @@ import 'package:chat_bubbles/message_bars/message_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kahtoo_messenger/API/WS/WebSocketConnect.dart';
+import 'package:kahtoo_messenger/Constants/Addresses.dart';
 import 'package:kahtoo_messenger/Constants/Colors.dart';
 import 'package:kahtoo_messenger/Models/chat_message_model.dart';
 import 'package:kahtoo_messenger/Models/chat_model.dart';
@@ -29,7 +30,6 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isLoading = true;
   late ChatModel chat;
   List<ChatMessageModel> chats = [];
-
   @override
   void initState() {
     // TODO: implement initState
@@ -84,6 +84,33 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: GestureDetector(
+          onTap: () {
+            Get.toNamed(ScreenName.userInfo, arguments: {'chat': chat});
+          },
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Image.network(chat.avatarURL ?? ''),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text(chat.name!)
+            ],
+          ),
+        ),
+      ),
       body: Visibility(
         visible: isLoading,
         replacement: Center(

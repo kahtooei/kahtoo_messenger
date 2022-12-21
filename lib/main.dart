@@ -3,6 +3,7 @@ import 'package:kahtoo_messenger/Constants/Addresses.dart';
 import 'package:kahtoo_messenger/Constants/Colors.dart';
 import 'package:kahtoo_messenger/Screens/Chat/chat_screen.dart';
 import 'package:kahtoo_messenger/Screens/GroupChat/groupchat_screen.dart';
+import 'package:kahtoo_messenger/Screens/GroupInfo/groupInfo_screen.dart';
 import 'package:kahtoo_messenger/Screens/Groups/group_screen.dart';
 import 'package:kahtoo_messenger/Screens/Login/login_screen.dart';
 import 'package:kahtoo_messenger/Screens/Register/register_screen.dart';
@@ -11,6 +12,7 @@ import 'package:kahtoo_messenger/Screens/Message/messages_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kahtoo_messenger/Screens/Home/home.dart';
+import 'package:kahtoo_messenger/Screens/UserInfo/userInfo_screen.dart';
 import 'package:kahtoo_messenger/Screens/Welcome/welcome_screen.dart';
 
 void main() async {
@@ -52,6 +54,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: ScreenName.chat, page: () => const ChatScreen()),
         GetPage(
             name: ScreenName.groupchat, page: () => const GroupChatScreen()),
+        GetPage(name: ScreenName.userInfo, page: () => const UserInfo()),
+        GetPage(name: ScreenName.groupInfo, page: () => const GroupInfo()),
       ],
       initialRoute: ScreenName.splash,
     );

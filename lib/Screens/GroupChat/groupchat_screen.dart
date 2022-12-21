@@ -13,6 +13,7 @@ import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import 'package:kahtoo_messenger/Storage/Database/dbservices/messageservices.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../Constants/Addresses.dart';
 import '../../Storage/Database/dbmodels/message.dart';
 import 'groupchat_listview.dart';
 
@@ -82,6 +83,33 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: GestureDetector(
+          onTap: () {
+            Get.toNamed(ScreenName.groupInfo, arguments: {'chat': chat});
+          },
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Image.network(chat.avatarURL ?? ''),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Text(chat.name!)
+            ],
+          ),
+        ),
+      ),
       body: Visibility(
         visible: isLoading,
         replacement: Center(

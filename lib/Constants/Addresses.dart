@@ -31,4 +31,6 @@ class ScreenName {
   static String welcome = '/welcome';
   static String chat = '/chat';
   static String groupchat = '/groupchat';
+  static String userInfo = '/userInfo';
+  static String groupInfo = '/groupInfo';
 }
