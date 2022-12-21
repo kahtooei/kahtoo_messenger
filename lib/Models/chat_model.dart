@@ -17,4 +17,17 @@ class ChatModel {
       this.lastMessageDate,
       this.lastMessageID,
       this.avatarURL});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "name": name,
+      "username": username,
+      "lastMessageDate": lastMessageDate,
+      "lastMessage": lastMessage,
+      "lastMessageID": lastMessageID,
+      "avatarURL": avatarURL,
+      "unReadCount": unReadCount,
+    };
+  }
 }

@@ -2,6 +2,7 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kahtoo_messenger/Screens/Home/newChat_dialog.dart';
+import 'package:kahtoo_messenger/Screens/Home/newGroup_dialog.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
 import '../../Constants/Colors.dart';
 import '../../Models/my_model.dart';
@@ -54,12 +55,21 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.dialog(
-              WillPopScope(
-                onWillPop: () async => true,
-                child: NewChatDialog(),
-              ),
-              barrierDismissible: false);
+          if (_currentIndex == 0) {
+            Get.dialog(
+                WillPopScope(
+                  onWillPop: () async => true,
+                  child: NewChatDialog(),
+                ),
+                barrierDismissible: false);
+          } else if (_currentIndex == 1) {
+            Get.dialog(
+                WillPopScope(
+                  onWillPop: () async => true,
+                  child: NewGroupDialog(),
+                ),
+                barrierDismissible: false);
+          }
         },
         tooltip: 'New',
         backgroundColor: ColorsRepo.getMainColor(),

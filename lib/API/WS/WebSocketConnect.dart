@@ -45,7 +45,6 @@ class WebSocketConnect {
   }
 
   static _handleReceivedMessages(Map _data) {
-    print("Received Data ==> $_data");
     Map functionsList = {
       'groups': _getGroups,
       "fetch_message": _fetchMessage,
@@ -206,6 +205,18 @@ class WebSocketConnect {
         "command": "send",
         "message": content,
         "values": {temp: receiver}
+      }));
+      //set seen date in local database
+    } else {
+      ShowErrorSnack.show("No Internet", "You Are Disconnect");
+    }
+  }
+
+  static addToGroup(String groupname) {
+    if (isConnected && groupname.isNotEmpty) {
+      _channel.sink.add(json.encode({
+        "command": "addMyGroup",
+        "values": {"groupname": groupname}
       }));
       //set seen date in local database
     } else {

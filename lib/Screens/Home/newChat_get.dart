@@ -21,7 +21,6 @@ class NewChatGet extends GetxController {
           ChatUser chatUser = await UserServices.setOne(
               ChatUser(username: username, name: user.name));
           //dismiss dialog
-          debugPrint("Username Model ==> ${chatUser.toMap()}");
           Get.back();
           ChatModel chat = ChatModel(
               id: chatUser.id,
