@@ -50,6 +50,11 @@ class StylesRepo {
           fontSize: 12,
           fontWeight: FontWeight.w600,
           fontFamily: FontsRepo.getFontName()),
+      'tiny': TextStyle(
+          color: Colors.black45,
+          fontSize: 12,
+          // fontWeight: FontWeight.w600,
+          fontFamily: FontsRepo.getFontName()),
     };
     return styles[style_name] ?? const TextStyle();
   }

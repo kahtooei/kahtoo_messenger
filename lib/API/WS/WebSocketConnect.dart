@@ -44,6 +44,12 @@ class WebSocketConnect {
     );
   }
 
+  static endConnection() async {
+    if (isConnected) {
+      await _channel.sink.close();
+    }
+  }
+
   static _handleReceivedMessages(Map _data) {
     Map functionsList = {
       'groups': _getGroups,

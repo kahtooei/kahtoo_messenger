@@ -1,6 +1,7 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kahtoo_messenger/Constants/Styles.dart';
 import 'package:kahtoo_messenger/Screens/Home/newChat_dialog.dart';
 import 'package:kahtoo_messenger/Screens/Home/newGroup_dialog.dart';
 import 'package:kahtoo_messenger/Storage/Cache/local_cache.dart';
@@ -36,21 +37,26 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Kahtoo Messenger"),
-        backgroundColor: ColorsRepo.getMainColor(),
-      ),
-      body: SizedBox.expand(
-        child: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() => _currentIndex = index);
-          },
-          children: <Widget>[
-            MessageScreen(),
-            GroupScreen(),
-            SettingScreen(),
-          ],
+      // appBar: AppBar(
+      //   title: Text(
+      //     "Inbox",
+      //     style: StylesRepo.getStyle(style_name: "H1"),
+      //   ),
+      //   backgroundColor: Colors.white,
+      // ),
+      body: SafeArea(
+        child: SizedBox.expand(
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() => _currentIndex = index);
+            },
+            children: <Widget>[
+              MessageScreen(),
+              GroupScreen(),
+              SettingScreen(),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
